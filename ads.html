@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Viewer App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        #startBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #startBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        #startBtn:active {
+            transform: translateY(0);
+        }
+
+        #startBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .ad-container {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .ad-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .ad-content {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .ad-description {
+            font-size: 0.95em;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .ad-timer {
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stats h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 10px 20px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Ad Viewer</h1>
+        <p class="subtitle">Click the button to start viewing ads</p>
+        
+        <button id="startBtn">Start Ads</button>
+
+        <div id="adContainer" class="ad-container">
+            <div class="ad-content" id="adContent"></div>
+            <div class="ad-description" id="adDescription"></div>
+            <div class="ad-timer">⏱️ Time remaining: <span id="timer">5</span>s</div>
+        </div>
+
+        <div class="stats">
+            <h3>Your Stats</h3>
+            <div class="stat-item">
+                <div class="stat-number" id="adsViewed">0</div>
+                <div class="stat-label">Ads Viewed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalTime">0</div>
+                <div class="stat-label">Seconds Watched</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ads = [
+            { title: "🚀 SuperPhone Pro", desc: "The fastest smartphone on the planet!" },
+            { title: "🍕 Pizza Paradise", desc: "Order now and get 50% off your first pizza!" },
+            { title: "🎮 GameMaster Console", desc: "Experience gaming like never before" },
+            { title: "👟 RunFast Sneakers", desc: "Comfort meets style. Limited edition!" },
+            { title: "📚 Learn Anything Academy", desc: "Master new skills in just 30 days" },
+            { title: "☕ CoffeeBliss Maker", desc: "Brew café-quality coffee at home" },
+            { title: "🎵 MusicStream Premium", desc: "Unlimited music, zero ads. Join today!" },
+            { title: "🏋️ FitLife Gym", desc: "Transform your body. First month free!" }
+        ];
+
+        let adsViewed = 0;
+        let totalTime = 0;
+        let currentTimer = null;
+        let isPlaying = false;
+
+        const startBtn = document.getElementById('startBtn');
+        const adContainer = document.getElementById('adContainer');
+        const adContent = document.getElementById('adContent');
+        const adDescription = document.getElementById('adDescription');
+        const timerDisplay = document.getElementById('timer');
+        const adsViewedDisplay = document.getElementById('adsViewed');
+        const totalTimeDisplay = document.getElementById('totalTime');
+
+        startBtn.addEventListener('click', () => {
+            if (!isPlaying) {
+                window.open('https://www.effectivegatecpm.com/q8hcqztyqa?key=e7814ace10f8da2bdc8d22330a58b790', '_blank');
+                startAds();
+            }
+        });
+
+        function startAds() {
+            isPlaying = true;
+            startBtn.disabled = true;
+            startBtn.textContent = 'Watching...';
+            showNextAd();
+        }
+
+        function showNextAd() {
+            const randomAd = ads[Math.floor(Math.random() * ads.length)];
+            adContent.textContent = randomAd.title;
+            adDescription.textContent = randomAd.desc;
+            adContainer.classList.add('active');
+            
+            let timeLeft = 5;
+            timerDisplay.textContent = timeLeft;
+
+            currentTimer = setInterval(() => {
+                timeLeft--;
+                totalTime++;
+                timerDisplay.textContent = timeLeft;
+                totalTimeDisplay.textContent = totalTime;
+
+                if (timeLeft <= 0) {
+                    clearInterval(currentTimer);
+                    adsViewed++;
+                    adsViewedDisplay.textContent = adsViewed;
+                    
+                    adContainer.classList.remove('active');
+                    
+                    setTimeout(() => {
+                        showNextAd();
+                    }, 1000);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
